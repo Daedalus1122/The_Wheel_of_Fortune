@@ -1,5 +1,6 @@
 package com.example.thewheeloffortune
 
+import Navigation
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -28,27 +29,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            TheWheelOfFortuneTheme {
-
-                Column(modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Blue),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceEvenly
-
-                ) {
-                    Text(
-                        "The Wheel of Fortune",
-                        fontSize = 30.sp,
-                        fontStyle = FontStyle.Italic,
-                        fontWeight = FontWeight.Bold )
-                    Button(onClick = { /*TODO*/ }) {
-                        Text("Play game")
-                    }
-                }
-                // A surface container using the 'background' color from the theme
-
-                }
+            Navigation()
         }
     }
 }
