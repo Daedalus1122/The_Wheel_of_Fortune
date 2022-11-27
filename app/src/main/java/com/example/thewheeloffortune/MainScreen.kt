@@ -19,26 +19,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.thewheeloffortune.ui.theme.TheWheelOfFortuneTheme
+
 @Composable
-fun MainScreen(navController: NavController){
+fun MainScreen(navController: NavController) {
 
-                Column(modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Blue),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceEvenly
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Blue),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceEvenly
 
-                ) {
-                    Text(
-                        "The Wheel of Fortune",
-                        fontSize = 30.sp,
-                        fontStyle = FontStyle.Italic,
-                        fontWeight = FontWeight.Bold )
+    ) {
+        Text(
+            "The Wheel of Fortune",
+            fontSize = 30.sp,
+            fontStyle = FontStyle.Italic,
+            fontWeight = FontWeight.Bold
+        )
 
-                    Button(onClick = { navController.navigate(Screen.GameScreen.route) }) {
-                        Text("Play game")
-                    }
-                }
-                // A surface container using the 'background' color from the theme
+        Button(onClick = { navController.navigate(Screen.GameScreen.route) }) {
+            Text("Play game")
+        }
+    }
+    // A surface container using the 'background' color from the theme
 
-            }
+}

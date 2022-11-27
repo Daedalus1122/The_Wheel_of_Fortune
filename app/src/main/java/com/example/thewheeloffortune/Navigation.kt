@@ -1,14 +1,13 @@
+import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.example.thewheeloffortune.MainActivity
-import com.example.thewheeloffortune.MainScreen
-import com.example.thewheeloffortune.Screen
+import com.example.thewheeloffortune.*
 import com.example.thewheeloffortune.ui.theme.GameScreen
 
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
 fun Navigation(){
   val navController = rememberNavController()
@@ -18,8 +17,11 @@ fun Navigation(){
 
         }
         composable(route = Screen.GameScreen.route){
-            GameScreen()
+            GameScreen(viewModel = GameScreenViewModel(), navController)
 
+        }
+        composable(route= Screen.ChooseCategoryScreen.route){
+            ChooseCategoryScreen()
         }
     }
 }
