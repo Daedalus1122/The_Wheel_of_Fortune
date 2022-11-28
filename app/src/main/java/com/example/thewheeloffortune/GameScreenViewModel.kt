@@ -1,7 +1,6 @@
 package com.example.thewheeloffortune
 
-import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-import android.provider.UserDictionary.Words
+
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 
@@ -13,11 +12,13 @@ class GameScreenViewModel {
 
     val points: MutableState<Int> = mutableStateOf(0)
 
-    val currentPoints: MutableState<Int> = mutableStateOf(100)
+    val currentPoints: MutableState<Int> = mutableStateOf(0)
 
     val words: ArrayList<String> = ArrayList()
 
+    val checkForSpinWheel = mutableStateOf(true)
 
-
+    val checkForCheckLetter =  mutableStateOf(false)
 
 }
+

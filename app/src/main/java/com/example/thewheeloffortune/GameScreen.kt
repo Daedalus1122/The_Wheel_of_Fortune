@@ -23,16 +23,20 @@ import com.example.thewheeloffortune.Screen
 @Composable
 fun GameScreen(viewModel: GameScreenViewModel, navController: NavController) {
     viewModel.words.add("he j")
-    var word: String = viewModel.words.random()
+    val word: String = viewModel.words.random()
     var textFieldState by remember {
         mutableStateOf("")
     }
     val checkForLetter = remember {
         mutableStateOf(false)
     }
-    val spinWheel = remember {
-        mutableStateOf(0)
+    val spinWheelCheck = remember {
+        mutableStateOf(false)
     }
+    val checkForSpinWheel = viewModel.checkForSpinWheel
+
+    val checkForCheckLetter = viewModel.checkForCheckLetter
+
     val lives = viewModel.lives
 
     val totalpoints = viewModel.points
@@ -42,66 +46,79 @@ fun GameScreen(viewModel: GameScreenViewModel, navController: NavController) {
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Blue)
-    ) {}
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(130.dp)
-    )
-    {
-        LetterBoxes(word = word, viewModel.guessedletters, points = totalpoints, navController)
-    }
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Bottom,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = 10.dp)
     ) {
-        Text(text = "Points at stake " + currentPoints.value, textAlign = TextAlign.Center)
-        TextField(
-            value = textFieldState,
-            onValueChange = {
-                textFieldState = it
-            },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-
-
-            )
-        Button(onClick = { checkForLetter.value = true }) {
-            if (checkForLetter.value == true) {
-                searchForLetter(
-                    letter = textFieldState.get(0),
-                    word = word,
-                    viewModel.guessedletters,
-                    lives,
-                    totalpoints,
-                    currentPoints
-                )
-                checkForLetter.value = false
-                textFieldState = ""
-            }
-        }
         Row(
-            verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.SpaceEvenly,
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 20.dp)
-
-        ) {
-            Text(text = "Lives " + lives.value)
-            Text(text = "points " + totalpoints.value)
+                .height(130.dp)
+        )
+        {
+            LetterBoxes(word = word, viewModel.guessedletters, points = totalpoints, navController)
         }
-    }
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Bottom,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 10.dp)
+        ) {
+            Button(onClick = { spinWheelCheck.value = true } , enabled = checkForSpinWheel.value) {
+                Text(text = "Spin Wheel")
+                if (spinWheelCheck.value == true) {
+                    SpinWheel(currentPoints)
+                    checkForSpinWheel.value=false
+                    checkForCheckLetter.value=true
+                    spinWheelCheck.value = false
+                }
+            }
+            Text(text = "Points at stake " + currentPoints.value, textAlign = TextAlign.Center)
+            TextField(
+                value = textFieldState,
+                onValueChange = {
+                    textFieldState = it
+                },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
 
+
+                )
+            Button(onClick = { checkForLetter.value = true }, enabled = checkForCheckLetter.value) {
+                Text(text = "Guess letter")
+                if (checkForLetter.value && textFieldState !="") {
+                    SearchForLetter(
+                        letter = textFieldState.get(0),
+                        word = word,
+                        viewModel.guessedletters,
+                        lives,
+                        totalpoints,
+                        currentPoints,
+                        checkForCheckLetter,
+                        checkForSpinWheel
+                    )
+                    checkForLetter.value = false
+                    textFieldState = ""
+                }
+            }
+            Row(
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp)
+
+            ) {
+                Text(text = "Lives " + lives.value)
+                Text(text = "points " + totalpoints.value)
+            }
+        }
+
+    }
 }
 
 @Composable
-fun checklives(lives: MutableState<Int>) {
+fun Checklives(lives: MutableState<Int>) {
     lives.value--
 
     if (lives.value == 0) {
@@ -156,7 +173,7 @@ fun LetterBoxes(
                             fontSize = 35.sp,
                             modifier = Modifier.fillMaxSize()
                         )
-                        checkForWin(
+                        CheckForWin(
                             word = word,
                             guessedLetters = guessedLetters,
                             points = points,
@@ -170,15 +187,16 @@ fun LetterBoxes(
 }
 
 @Composable
-fun checkForWin(
+fun CheckForWin(
     word: String,
     guessedLetters: ArrayList<Char>,
     points: MutableState<Int>,
-    navController: NavController
-) {
+    navController: NavController,
 
+) {
+    /* todo find a way to remove space betweem words*/
     val size: Int = word.toCharArray().size
-    var correct: Int = 0
+    var correct = 0
     word.forEach {
         for (letters in guessedLetters) {
             if (it == letters) {
@@ -208,31 +226,61 @@ fun checkForWin(
 }
 
 
+@Suppress("NAME_SHADOWING")
 @Composable
-fun searchForLetter(
+fun SearchForLetter(
     letter: Char,
     word: String,
     letters: ArrayList<Char>,
     lives: MutableState<Int>,
     totalPoints: MutableState<Int>,
-    points: MutableState<Int>
+    points: MutableState<Int>,
+    checkForCheckLetter: MutableState<Boolean>,
+    checkForSpinWheel: MutableState<Boolean>
 ) {
-    var found: Boolean = false
-    word.toCharArray().forEach {
-        if (it == letter) {
-            letters.add(letter)
-            addPoints(totalPoints = totalPoints, points = points)
-            found = true
+    var found = false
+    var alreadyGuessed = false
+    for (letters in letters) {
+
+
+        if (letter==letters) {
+            alreadyGuessed=true
+            Dialog(onDismissRequest = { /*TODO*/ }) {
+                Text(text = "Letter has already been choosen")
+                }
+
+
+            break
         }
     }
-    if (found == false) {
-        checklives(lives = lives)
+    if (alreadyGuessed==false) {
+        word.toCharArray().forEach {
+            if (it == letter) {
+                letters.add(letter)
+                AddPoints(totalPoints = totalPoints, points = points)
+                found = true
+            }
+        }
+        if (found == false) {
+            Checklives(lives = lives)
+        }
+        checkForSpinWheel.value= true
+        checkForCheckLetter.value = false
     }
 }
 
 @Composable
-fun addPoints(totalPoints: MutableState<Int>, points: MutableState<Int>) {
+fun AddPoints(
+    totalPoints: MutableState<Int>,
+    points: MutableState<Int>,
+) {
     totalPoints.value = totalPoints.value + points.value
 
 }
+@Composable
+fun SpinWheel(currentPoints: MutableState<Int>) {
+    val possiblePoints: Int = (0..10).random()
+    currentPoints.value = possiblePoints * 100
 
+
+}
