@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -17,13 +18,15 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.example.thewheeloffortune.GameScreenViewModel
+import com.example.thewheeloffortune.R
 import com.example.thewheeloffortune.Screen
+import com.example.thewheeloffortune.data
 
+val word: String = findWord()
 
 @Composable
 fun GameScreen(viewModel: GameScreenViewModel, navController: NavController) {
-    viewModel.words.add("he j")
-    val word: String = viewModel.words.random()
+
     var textFieldState by remember {
         mutableStateOf("")
     }
@@ -39,7 +42,7 @@ fun GameScreen(viewModel: GameScreenViewModel, navController: NavController) {
 
     val lives = viewModel.lives
 
-    val totalpoints = viewModel.points
+    val totalpoints = viewModel.totalPoints
 
     val currentPoints = viewModel.currentPoints
     Column(
@@ -55,7 +58,7 @@ fun GameScreen(viewModel: GameScreenViewModel, navController: NavController) {
                 .height(130.dp)
         )
         {
-            LetterBoxes(word = word, viewModel.guessedletters, points = totalpoints, navController)
+            LetterBoxes(viewModel, navController)
         }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -64,38 +67,36 @@ fun GameScreen(viewModel: GameScreenViewModel, navController: NavController) {
                 .fillMaxSize()
                 .padding(bottom = 10.dp)
         ) {
-            Button(onClick = { spinWheelCheck.value = true } , enabled = checkForSpinWheel.value) {
-                Text(text = "Spin Wheel")
-                if (spinWheelCheck.value == true) {
-                    SpinWheel(currentPoints)
-                    checkForSpinWheel.value=false
-                    checkForCheckLetter.value=true
+            Button(onClick = { spinWheelCheck.value = true }, enabled = checkForSpinWheel.value) {
+                Text(text = stringResource(id = R.string.spin_wheel))
+                if (spinWheelCheck.value) {
+                    SpinWheel(viewModel)
+                    checkForSpinWheel.value = false
+                    checkForCheckLetter.value = true
                     spinWheelCheck.value = false
                 }
             }
-            Text(text = "Points at stake " + currentPoints.value, textAlign = TextAlign.Center)
+            Text(
+                text = stringResource(id = R.string.points_at_stake) + currentPoints.value,
+                textAlign = TextAlign.Center
+            )
             TextField(
                 value = textFieldState,
-                onValueChange = {
-                    textFieldState = it
-                },
+                onValueChange = { textFieldState = it },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
 
 
                 )
+
             Button(onClick = { checkForLetter.value = true }, enabled = checkForCheckLetter.value) {
-                Text(text = "Guess letter")
-                if (checkForLetter.value && textFieldState !="") {
+                Text(text = stringResource(id = R.string.guess_letter))
+                if (checkForLetter.value && textFieldState != "") {
                     SearchForLetter(
                         letter = textFieldState.get(0),
                         word = word,
-                        viewModel.guessedletters,
-                        lives,
-                        totalpoints,
-                        currentPoints,
-                        checkForCheckLetter,
-                        checkForSpinWheel
+                        viewModel,
+                        navController
                     )
                     checkForLetter.value = false
                     textFieldState = ""
@@ -109,8 +110,8 @@ fun GameScreen(viewModel: GameScreenViewModel, navController: NavController) {
                     .padding(top = 20.dp)
 
             ) {
-                Text(text = "Lives " + lives.value)
-                Text(text = "points " + totalpoints.value)
+                Text(text = stringResource(id = R.string.lives) + lives.value)
+                Text(text = stringResource(id = R.string.points) + totalpoints.value)
             }
         }
 
@@ -118,32 +119,36 @@ fun GameScreen(viewModel: GameScreenViewModel, navController: NavController) {
 }
 
 @Composable
-fun Checklives(lives: MutableState<Int>) {
-    lives.value--
+fun Checklives(viewModel: GameScreenViewModel, navController: NavController) {
+    data.life = data.life - 1
+    println(data.life)
+    viewModel.lives.value--
 
-    if (lives.value == 0) {
-        /* Dialog(onDismissRequest = { /*TODO*/ }) {
-             Column() {
-                 Text(text = "You have lost. you earned: " + points.value + "points")
-                 Text(text = "You have won. Do you want to play again?")
+    if (viewModel.lives.value == 0) {
+        Dialog(onDismissRequest = { }) {
+            Column() {
+
+                Text(text = stringResource(id = R.string.lost_message1) + viewModel.totalPoints.value)
+                Text(text = stringResource(id = R.string.lost_message2))
 
 
-                 Button(onClick = { /*TODO*/ }) {
-                     Text(text = "Play Again")
-                 }
-                 Button(onClick = { navController.navigate(Screen.MainScreen.route) }) {
-                     Text(text = "Main Menu")
-           }
-         */
+                Button(onClick = { navController.navigate(Screen.ChooseCategoryScreen.route); data.newGame() }) {
+                    Text(text = stringResource(id = R.string.play_again))
+
+                }
+                Button(onClick = { navController.navigate(Screen.MainScreen.route); data.newGame() }) {
+                    Text(text = stringResource(id = R.string.main_menu))
+
+                }
+            }
+        }
     }
 }
 
 
 @Composable
 fun LetterBoxes(
-    word: String,
-    guessedLetters: ArrayList<Char>,
-    points: MutableState<Int>,
+    viewModel: GameScreenViewModel,
     navController: NavController
 ) {
 
@@ -165,7 +170,7 @@ fun LetterBoxes(
                     .height(40.dp)
                     .width(30.dp)
             ) {
-                for (letters in guessedLetters)
+                for (letters in viewModel.guessedletters)
                     if (it == letters) {
                         Text(
                             text = it.toString(),
@@ -175,12 +180,10 @@ fun LetterBoxes(
                         )
                         CheckForWin(
                             word = word,
-                            guessedLetters = guessedLetters,
-                            points = points,
-                            navController = navController
+                            viewModel,
+                            navController
                         )
                     }
-
             }
         }
     }
@@ -189,16 +192,20 @@ fun LetterBoxes(
 @Composable
 fun CheckForWin(
     word: String,
-    guessedLetters: ArrayList<Char>,
-    points: MutableState<Int>,
+    viewModel: GameScreenViewModel,
     navController: NavController,
 
-) {
+    ) {
     /* todo find a way to remove space betweem words*/
-    val size: Int = word.toCharArray().size
+    var size: Int = word.toCharArray().size
+    word.toCharArray().forEach {
+        if (it == ' ') {
+            size -= 1
+        }
+    }
     var correct = 0
     word.forEach {
-        for (letters in guessedLetters) {
+        for (letters in viewModel.guessedletters) {
             if (it == letters) {
                 correct++
                 break
@@ -207,17 +214,24 @@ fun CheckForWin(
 
     }
     if (size == correct) {
+
         Dialog(onDismissRequest = { }) {
             Column() {
-                Text(text = "You have won. you earned: " + points.value + "points")
-                Text(text = "You have won. Do you want to play again?")
+
+                Text(
+                    text = stringResource(id = R.string.win_message1) + viewModel.totalPoints.value + stringResource(
+                        id = R.string.points
+                    )
+                )
+                Text(text = stringResource(id = R.string.win_message2))
 
 
-                Button(onClick = { navController.navigate(Screen.ChooseCategoryScreen.route) }) {
-                    Text(text = "Play Again")
+                Button(onClick = { navController.navigate(Screen.ChooseCategoryScreen.route); data.newGame() }) {
+                    Text(text = stringResource(id = R.string.play_again))
+
                 }
-                Button(onClick = { navController.navigate(Screen.MainScreen.route) }) {
-                    Text(text = "Main Menu")
+                Button(onClick = { navController.navigate(Screen.MainScreen.route); data.newGame() }) {
+                    Text(text = stringResource(id = R.string.main_menu))
 
                 }
             }
@@ -231,56 +245,84 @@ fun CheckForWin(
 fun SearchForLetter(
     letter: Char,
     word: String,
-    letters: ArrayList<Char>,
-    lives: MutableState<Int>,
-    totalPoints: MutableState<Int>,
-    points: MutableState<Int>,
-    checkForCheckLetter: MutableState<Boolean>,
-    checkForSpinWheel: MutableState<Boolean>
+    viewModel: GameScreenViewModel,
+    navController: NavController
 ) {
     var found = false
     var alreadyGuessed = false
-    for (letters in letters) {
+    for (letters in viewModel.guessedletters) {
 
 
-        if (letter==letters) {
-            alreadyGuessed=true
+        if (letter == letters) {
+            alreadyGuessed = true
             Dialog(onDismissRequest = { /*TODO*/ }) {
-                Text(text = "Letter has already been choosen")
-                }
+                Text(text = stringResource(id = R.string.already_chosen))
+            }
 
 
             break
         }
     }
-    if (alreadyGuessed==false) {
+    if (alreadyGuessed == false) {
         word.toCharArray().forEach {
             if (it == letter) {
-                letters.add(letter)
-                AddPoints(totalPoints = totalPoints, points = points)
+                viewModel.guessedletters.add(letter)
+                AddPoints(viewModel)
                 found = true
             }
         }
         if (found == false) {
-            Checklives(lives = lives)
+            Checklives(viewModel, navController)
         }
-        checkForSpinWheel.value= true
-        checkForCheckLetter.value = false
+        viewModel.checkForSpinWheel.value = true
+        viewModel.checkForCheckLetter.value = false
     }
 }
 
 @Composable
 fun AddPoints(
-    totalPoints: MutableState<Int>,
-    points: MutableState<Int>,
+    viewModel: GameScreenViewModel
 ) {
-    totalPoints.value = totalPoints.value + points.value
+    viewModel.totalPoints.value = viewModel.totalPoints.value + viewModel.currentPoints.value
 
 }
+
 @Composable
-fun SpinWheel(currentPoints: MutableState<Int>) {
+fun SpinWheel(viewModel: GameScreenViewModel) {
     val possiblePoints: Int = (0..10).random()
-    currentPoints.value = possiblePoints * 100
+    viewModel.currentPoints.value = possiblePoints * 100
+}
 
+fun findWord(): String {
+    when (data.currentCategory) {
+        "animalCategory" -> data.currentWord =
+            data.animalCategory[(0 until data.animalCategory.size).random()]
+        "flowerCategory" -> data.currentWord =
+            data.flowerCategory[(0 until data.flowerCategory.size).random()]
+        "woodCategory" -> data.currentWord =
+            data.woodCategory[(0 until data.woodCategory.size).random()]
+    }
 
+    return data.currentWord
+}
+
+@Composable
+fun KeyBoard() {
+    Column {
+    /* Todo make a qwerty keyboard in the rows below */
+        Row(modifier = Modifier.fillMaxWidth()) {
+
+        }
+        Row(modifier = Modifier.fillMaxWidth()) {
+
+        }
+        Row(modifier = Modifier.fillMaxWidth()) {
+
+        }
+    }
+}
+
+@Composable
+fun Keyboard() {
+    /* TODO make a function that is a button for all the keyboards strokes with the right box size */
 }

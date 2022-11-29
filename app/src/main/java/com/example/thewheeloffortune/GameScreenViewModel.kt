@@ -8,9 +8,9 @@ class GameScreenViewModel {
 
     val guessedletters: ArrayList<Char> = ArrayList()
 
-    val lives: MutableState<Int> = mutableStateOf(5)
+    val lives: MutableState<Int> = mutableStateOf(data.life)
 
-    val points: MutableState<Int> = mutableStateOf(0)
+    val totalPoints: MutableState<Int> = mutableStateOf(data.points)
 
     val currentPoints: MutableState<Int> = mutableStateOf(0)
 

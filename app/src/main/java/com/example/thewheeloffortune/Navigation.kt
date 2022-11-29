@@ -17,11 +17,11 @@ fun Navigation(){
 
         }
         composable(route = Screen.GameScreen.route){
-            GameScreen(viewModel = GameScreenViewModel(), navController)
+            GameScreen(viewModel = GameScreenViewModel(), navController,)
 
         }
         composable(route= Screen.ChooseCategoryScreen.route){
-            ChooseCategoryScreen()
+            ChooseCategoryScreen(navController, )
         }
     }
 }
