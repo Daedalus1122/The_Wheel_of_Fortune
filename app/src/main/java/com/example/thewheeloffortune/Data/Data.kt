@@ -1,14 +1,8 @@
 package com.example.thewheeloffortune.Data
 
-import com.example.thewheeloffortune.model.Letters
-import com.example.thewheeloffortune.model.Words
+
 
 class Data() {
-
-      //var letters = Letters(charArray = CharArray(), guessedletter = )
-
-    //var words = Words()
-
     var currentCategory = ""
 
     var currentWord = ""
@@ -25,10 +19,13 @@ class Data() {
 
     var points = 0
 
+    var guessedletters: ArrayList<Char> = ArrayList()
+
     fun newGame() {
         currentCategory = ""
         currentWord = ""
         life = 5
         points=0
+        guessedletters= ArrayList()
     }
 }
