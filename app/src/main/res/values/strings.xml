@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">The Wheel of Fortune</string>
+    <string name="app_name">216248The Wheel of Fortune</string>
     <string name="Play_game">play Game</string>
     <string name="spin_wheel">Spin Wheel</string>
     <string name="points_at_stake">Points at stake  </string>
@@ -13,5 +13,7 @@
     <string name="already_chosen">"Letter has already been chosen"</string>
     <string name="chose_category">Chose category</string>
     <string name="lost_message1">You have lost. </string>
+    <string name="category">Category </string>
     <string name="lost_message2">"You have lost. Do you want to play again?"</string>
+
 </resources>

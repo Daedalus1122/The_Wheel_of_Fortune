@@ -67,7 +67,7 @@ fun GameScreen(viewModel: GameScreenViewModel, navController: NavController) {
                 .padding(bottom = 10.dp)
         ) {
             Text(
-                text = "Category " + data.currentCategory,
+                text = R.string.category.toString()+ " "+ data.currentCategory,
                 textAlign = TextAlign.Center,
                 fontSize = 20.sp
             )
