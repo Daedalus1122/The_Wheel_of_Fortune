@@ -16,14 +16,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.Popup
 import androidx.navigation.NavController
-import com.example.thewheeloffortune.GameScreenViewModel
+import com.example.thewheeloffortune.*
 import com.example.thewheeloffortune.R
-import com.example.thewheeloffortune.Screen
-import com.example.thewheeloffortune.data
 
-val word: String = findWord()
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -70,6 +66,12 @@ fun GameScreen(viewModel: GameScreenViewModel, navController: NavController) {
                 .fillMaxSize()
                 .padding(bottom = 10.dp)
         ) {
+            Text(
+                text = "Category " + data.currentCategory,
+                textAlign = TextAlign.Center,
+                fontSize = 20.sp
+            )
+            Spacer(modifier = Modifier.padding(50.dp))
             Button(onClick = { spinWheelCheck.value = true }, enabled = checkForSpinWheel.value) {
                 Text(text = stringResource(id = R.string.spin_wheel))
                 if (spinWheelCheck.value) {
@@ -89,20 +91,23 @@ fun GameScreen(viewModel: GameScreenViewModel, navController: NavController) {
                 text = stringResource(id = R.string.points_at_stake) + " " + currentPoints.value,
                 textAlign = TextAlign.Center
             )
+
+
             TextField(
                 value = textFieldState,
-                onValueChange = { textFieldState = it },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-
-
-                )
+                onValueChange = {
+                    if (it.length <= data.maxLength) {
+                        textFieldState = it
+                    }
+                },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Default),
+            )
 
             Button(onClick = { checkForLetter.value = true }, enabled = checkForCheckLetter.value) {
                 Text(text = stringResource(id = R.string.guess_letter))
                 if (checkForLetter.value && textFieldState != "") {
                     SearchForLetter(
-                        letter = textFieldState.get(0), word = word, viewModel
+                        letter = textFieldState[0], word = word, viewModel
 
                     )
 
@@ -135,7 +140,7 @@ fun DecrementLife(viewModel: GameScreenViewModel) {
 @Composable
 fun CheckLives(viewModel: GameScreenViewModel, navController: NavController) {
     if (viewModel.lives.value == 0) {
-        Dialog(onDismissRequest = {  }) {
+        Dialog(onDismissRequest = { }) {
             Column(verticalArrangement = Arrangement.Center) {
 
                 Text(
@@ -186,7 +191,7 @@ fun LetterBoxes(
                     Text(
                         text = it.toString(),
                         color = Color.Blue,
-                        fontSize = 35.sp,
+                        fontSize = 30.sp,
                         modifier = Modifier.fillMaxSize()
                     )
                     CheckForWin(
@@ -206,7 +211,6 @@ fun CheckForWin(
     navController: NavController,
 
     ) {
-    /* todo find a way to remove space betweem words*/
     var size: Int = word.toCharArray().size
     word.toCharArray().forEach {
         if (it == ' ') {
@@ -266,7 +270,7 @@ fun SearchForLetter(
     for (letters in data.guessedletters) {
         if (letter == letters) {
             alreadyGuessed = true
-            Popup { Alignment.Center; Arrangement.Center; }
+            // didn't get popup to work probably
         }
 
     }
@@ -291,7 +295,6 @@ fun SearchForLetter(
 }
 
 
-
 @Composable
 fun AddPoints(
     viewModel: GameScreenViewModel
@@ -309,15 +312,15 @@ fun SpinWheel(viewModel: GameScreenViewModel) {
 
 fun findWord(): String {
     when (data.currentCategory) {
-        "animalCategory" -> {
+        "Animal" -> {
             data.animalCategory[java.util.Random()
                 .nextInt(data.animalCategory.size)].also { data.currentWord = it }
         }
-        "flowerCategory" -> {
+        "Flower" -> {
             data.flowerCategory[java.util.Random()
                 .nextInt(data.flowerCategory.size)].also { data.currentWord = it }
         }
-        "woodCategory" -> {
+        "Tree" -> {
             data.woodCategory[java.util.Random()
                 .nextInt(data.woodCategory.size)].also { data.currentWord = it }
         }

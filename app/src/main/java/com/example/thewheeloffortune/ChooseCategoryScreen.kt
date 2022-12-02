@@ -11,14 +11,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.thewheeloffortune.ui.theme.findWord
 
 @Composable
 fun ChooseCategoryScreen(navController: NavController) {
     Column(modifier = Modifier.fillMaxSize()) {
         Button(
             onClick = {
-                data.currentCategory = data.categoryArray[0]; navController.navigate(
+                data.currentCategory = data.categoryArray[0];word=findWord(); navController.navigate(
                 Screen.GameScreen.route,
+
             )
             },
             modifier = Modifier
@@ -34,7 +36,7 @@ fun ChooseCategoryScreen(navController: NavController) {
         Button(
             onClick = {
                 data.currentCategory =
-                    data.categoryArray[1]; navController.navigate(Screen.GameScreen.route)
+                    data.categoryArray[1];word=findWord(); navController.navigate(Screen.GameScreen.route)
             }, modifier = Modifier
                 .fillMaxWidth()
                 .height(40.dp)
@@ -46,7 +48,7 @@ fun ChooseCategoryScreen(navController: NavController) {
         Button(
             onClick = {
                 data.currentCategory =
-                    data.categoryArray[2]; navController.navigate(Screen.GameScreen.route)
+                    data.categoryArray[2];word=findWord(); navController.navigate(Screen.GameScreen.route)
             }, modifier = Modifier
                 .fillMaxWidth()
                 .height(40.dp)

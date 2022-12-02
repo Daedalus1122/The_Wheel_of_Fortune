@@ -7,19 +7,22 @@ class Data() {
 
     var currentWord = ""
 
-    val categoryArray = arrayOf("animalCategory", "flowerCategory", "woodCategory")
+    val categoryArray = arrayOf("Animal", "Flower", "Tree")
 
     val animalCategory = arrayOf("haj", "abe", "lus")
 
     val flowerCategory = arrayOf("rose", "lavender")
 
-    val woodCategory = arrayOf("oaks", "evergreen")
+    val woodCategory = arrayOf("oak", "evergreen")
 
     var life = 5
 
     var points = 0
 
+    val maxLength = 1
+
     var guessedletters: ArrayList<Char> = ArrayList()
+
 
     fun newGame() {
         currentCategory = ""
